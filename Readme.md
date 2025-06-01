@@ -10,22 +10,6 @@ A robust Java-based Library Management System that helps librarians and members 
 ### Database Model
 ![Database Diagram](diagrams/DatabaseER.png)
 
-## Project Structure
-├── src/
-│ ├── controller/
-│ ├── service/
-│ ├── dao/
-│ ├── model/
-│ ├── enums/
-│ └── Main.java
-├── diagrams/
-│ ├── class-diagram.png
-│ └── db-diagram.png
-├── resources/
-│ └── persistence.xml
-├── README.md
-└── pom.xml
-
 ## Features
 
 ### Authentication
