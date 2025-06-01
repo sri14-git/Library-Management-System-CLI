@@ -75,7 +75,6 @@ A robust Java-based Library Management System that helps librarians and members 
 2. Navigate to the project directory:
 3. Install dependencies using Maven:
 4. Set up the database:
-   - Create a new PostgreSQL database
    - Update `persistence.xml` with your database credentials
 
 5. Run the application:

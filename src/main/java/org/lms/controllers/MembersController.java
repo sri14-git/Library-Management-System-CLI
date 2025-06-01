@@ -44,7 +44,7 @@ public class MembersController {
                     System.out.println("********Login Successful*******");
                     System.out.println("1.Borrow Books");
                     System.out.println("2.Return Books");
-                    System.out.println("3.View My Transactions"); ///need to add available books
+                    System.out.println("3.View My Transactions");
                     System.out.println("4.Exit");
                     System.out.println("********************************");
                     System.out.print("Enter your Choice: ");
@@ -55,6 +55,7 @@ public class MembersController {
                                 bookService.printBooks(books);
                             } else {
                                 System.out.println("No Books Found");
+                                break;
                             }
                             System.out.print("Enter The ID Of The Book To Borrow: ");
                             int id = sc.nextInt();
@@ -69,6 +70,7 @@ public class MembersController {
                                 transactionService.printTransactions(transactions);
                             } else {
                                 System.out.println("No Transactions Found");
+                                break;
                             }
                             System.out.print("Enter The ID Of The Transaction To Return: ");
                             int tid = sc.nextInt();
@@ -99,12 +101,12 @@ public class MembersController {
             }
         } catch (InputMismatchException e) {
             System.out.println("Failed");
-            System.out.println("Kindly Make Sure,ID are given Correctly and Try Again");
+            System.out.println("Kindly Make Sure inputs are given Correctly and Try Again");
             sc.nextLine();
         }
         catch (Exception e) {
             System.out.println("Failed");
-            System.out.println("Kindly Make Sure,ID are given Correctly and Try Again");
+            System.out.println("Kindly Make Sure inputs are given Correctly and Try Again");
         }
     }
 

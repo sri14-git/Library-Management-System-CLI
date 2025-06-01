@@ -1,5 +1,6 @@
 package org.lms.dao;
 
+import org.lms.enums.Status;
 import org.lms.model.Book;
 
 import javax.persistence.EntityManager;
@@ -30,9 +31,11 @@ public class BookDAO {
     }
 
     public List<Book> getAvailableBooks(){
-        TypedQuery<Book> query = em.createQuery("SELECT b FROM Book b WHERE b.copiesAvailable > 0 ORDER BY b.bookId"
+        TypedQuery<Book> query = em.createQuery("SELECT b FROM Book b WHERE b.copiesAvailable > 0 AND b.status = :status ORDER BY b.bookId  "
                                                 ,Book.class);
+        query.setParameter("status",Status.AVAILABLE);
         return query.getResultList();
+
     }
 
     public List<Book> findAll() {

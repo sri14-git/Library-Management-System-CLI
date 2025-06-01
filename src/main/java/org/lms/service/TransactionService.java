@@ -52,7 +52,7 @@ public class TransactionService {
             Transaction transaction = new Transaction(member,book,date, TransactionType.BORROW,expectedReturnDate,null, Status.ACTIVE);
             transactionDAO.save(transaction);
         }
-        System.out.println("Book borrowed successfully,Kindly return on or before "+expectedReturnDate.toLocalDate() );
+        System.out.println("Book borrowed successfully,Kindly return on or before (7 days)"+expectedReturnDate.toLocalDate() );
     }
 
     public void returnBook(int memberId, int transactionId){

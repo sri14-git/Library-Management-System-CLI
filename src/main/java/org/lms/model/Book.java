@@ -1,5 +1,7 @@
 package org.lms.model;
 
+import org.lms.enums.Status;
+
 import javax.persistence.*;
 
 @Entity
@@ -25,17 +27,30 @@ public class Book {
 
     private int timesBorrowed;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
 
     public Book() {}
 
 
-    public Book(String title, String author, String genre, int totalCopies) {
+    public Book(String title, String author, String genre, int totalCopies, Status status) {
         this.title = title;
         this.author = author;
         this.genre = genre;
         this.totalCopies = totalCopies;
         this.copiesAvailable = totalCopies;
         this.timesBorrowed = 0;
+        this.status = status;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
     public int getBookId() {

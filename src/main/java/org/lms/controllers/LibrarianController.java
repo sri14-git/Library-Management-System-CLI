@@ -1,5 +1,6 @@
 package org.lms.controllers;
 
+import org.lms.enums.Status;
 import org.lms.enums.TransactionType;
 import org.lms.model.Book;
 import org.lms.model.Member;
@@ -11,8 +12,10 @@ import org.lms.service.TransactionService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
+import javax.persistence.RollbackException;
 import java.util.InputMismatchException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class LibrarianController {
@@ -36,14 +39,13 @@ public class LibrarianController {
         System.out.print("Enter password: ");
         String password = sc.next();
         int flag = 0;
-
+        try{
         if (authService.authenticate(username, password).getUsername().equals("admin")) {
             while (flag == 0) {
-                try{
                 System.out.println("********Login Successful*******");
                 System.out.println("1.Manage Books");
                 System.out.println("2.Manage Members");
-                System.out.println("3. Manage Transactions");
+                System.out.println("3.Manage Transactions");
                 System.out.println("4.Exit");
                 System.out.println("********************************");
                 System.out.print("Enter your Choice: ");
@@ -66,32 +68,39 @@ public class LibrarianController {
 
 
                 }
-            }catch(NoResultException e){
-                    System.out.println(" Failed");
-                }
-                catch (InputMismatchException e) {
-                    System.out.println("Kindly Make Sure,Option are given Correctly and Try Again");
-                    sc.nextLine();
-                }
+            }
         }
 
-    }
+    }catch(NoResultException e){
+            System.out.println(" Failed");
+        }
+        catch (NullPointerException e){
+            System.out.println("Failed");
+            System.out.println("Kindly Make Sure,Username and Password are given Correctly and Try Again");
+            sc.nextLine();
+        }
+        catch (InputMismatchException e) {
+            System.out.println("Kindly Make Sure to Option are given Correctly and Try Again");
+            sc.nextLine();
+        }
 
 
 
     }
-     public void manageBooks () {
+     public void manageBooks () {/// need to make changes and add status in the book
         int flag = 0;
         while (flag == 0) {
             try{
                 System.out.println("******** BOOKS MANAGEMENT *******");
             System.out.println("1.Add Book");
             System.out.println("2.Update Book stocks");
-            System.out.println("3.Delete Book");
+            System.out.println("3.Delete Book"); //add available books option
             System.out.println("4.List Books");
-            System.out.println("5.Exit");
-            System.out.println("Enter your Choice:");
-            System.out.println("********************************");
+            System.out.println("5. List Available Books");
+            System.out.println("6.Exit");
+                System.out.println("********************************");
+            System.out.print("Enter your Choice:");
+
             int choice = sc.nextInt();
             sc.nextLine();
             switch (choice) {
@@ -100,14 +109,16 @@ public class LibrarianController {
                     String title = sc.nextLine();
                     System.out.println("Enter Author: ");
                     String author = sc.nextLine();
-                    System.out.println("Enter Publisher: ");
-                    String publisher = sc.nextLine();
                     System.out.println("Enter Copies Available: ");
                     int quantity = sc.nextInt();
                     sc.nextLine();
+                    if(quantity<=0){
+                        System.out.println("Invalid Quantity");
+                        break;
+                    }
                     System.out.println("Enter the Genre");
                     String genre = sc.nextLine();
-                    Book book = new Book(title, author, genre, quantity);
+                    Book book = new Book(title, author, genre, quantity, Status.AVAILABLE);
                     bookService.save(book);
                     bookService.printBook(book);
                     System.out.println("Book Added Successfully");
@@ -126,18 +137,23 @@ public class LibrarianController {
                     Book book = bookService.findById(id);
                     if (book == null) {
                         System.out.println("Invalid ID");
+                        break;
                     }
                     else {
                         System.out.print("Enter the No Of Copies To Be Added: ");
                         int copies = sc.nextInt();
                         book.setCopiesAvailable(book.getCopiesAvailable() + copies);
                         book.setTotalCopies(book.getTotalCopies() + copies);
+                        if(book.getStatus().name().equals(Status.UNAVAILABLE.name())){
+                            book.setStatus(Status.AVAILABLE);
+                            System.out.println("Book is now Available");
+                        }
                         bookService.update(book);
                     }
                     break;
                 }
                 case 3: {
-                    List<Book> books = bookService.findAll();
+                    List<Book> books = bookService.getAvailableBooks();
                     if (!books.isEmpty()) {
                         bookService.printBooks(books);
                     } else {
@@ -148,17 +164,34 @@ public class LibrarianController {
                     int id = sc.nextInt();
                     sc.nextLine();
                     Book book = bookService.findById(id);
-                    if (book == null) {
-                        System.out.println("Invalid ID");
+                    List<Transaction> transactions = transactionService.getTransactionsByType(TransactionType.BORROW).stream()
+                            .filter(transaction -> transaction.getStatus().name().equals(Status.ACTIVE.name()))
+                            .filter(transaction -> transaction.getBook().getBookId()==book.getBookId()).toList();
+//                    transactionService.printTransactions(transactions);
+                    try{
+                    if(transactions.getFirst()!=null || transactions.getFirst().getStatus().name().equals(Status.ACTIVE.name())){
+
+                        System.out.println("Book is currently in use, kindly return the book first before deleting it");
                         break;
-                    }
-                    bookService.delete(id);
+                    }}catch (NoSuchElementException e){}
+                    book.setStatus(Status.UNAVAILABLE);
+                    book.setCopiesAvailable(0);
+                    book.setTotalCopies(0);
+
+                    try{
+                    bookService.update(book);
                     System.out.println("Deleted Successfully");
-                    break;
+                    break;}
+                    catch (NullPointerException e){
+                        System.out.println("Book is not available for deletion");
+                    }
+                    catch (RollbackException e){
+                        System.out.println("Book is Currently in use");
+                    }
+
                 }
                 case 4: {
                     List<Book> books = bookService.findAll();
-                    System.out.println("Books");
                     if (!books.isEmpty()) {
                         bookService.printBooks(books);
                     } else {
@@ -168,6 +201,15 @@ public class LibrarianController {
                     break;
                 }
                 case 5: {
+                    List<Book> books = bookService.getAvailableBooks();
+                    if (!books.isEmpty()) {
+                        bookService.printBooks(books);
+                    } else {
+                        System.out.println("No Books Found");
+                    }
+                    break;
+                }
+                case 6: {
                     flag = 1;
                     break;
                 }
@@ -175,9 +217,8 @@ public class LibrarianController {
                     System.out.println("Invalid Choice");
             }
         }catch(InputMismatchException e){
-                System.out.println("Kindly Make Sure,ID are given Correctly and Try Again");
+                System.out.println("Kindly Make Sure inputs are given Correctly and Try Again");
                 sc.nextLine();
-
             }
         }
     }

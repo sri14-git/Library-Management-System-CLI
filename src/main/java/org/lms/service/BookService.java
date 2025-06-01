@@ -34,42 +34,30 @@ public class BookService {
         bookDAO.delete(id);
     }
     public  void printBooks(List<Book> books) {
-        String format = "| %-8s | %-25s | %-20s | %-15s | %-12s | %-13s | %-14s |\n";
-        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+");
-        System.out.printf(format, "Book ID", "Title", "Author", "Genre", "Total Copies", "Available", "Times Borrowed");
-        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+");
+        String format = "| %-8s | %-25s | %-20s | %-15s | %-12s | %-13s | %-14s | %-14s |\n";
+        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+----------------+");
+        System.out.printf(format, "Book ID", "Title", "Author", "Genre", "Total Copies", "Available", "Times Borrowed","Status");
+        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+----------------+");
 
         for (Book b : books) {
-            System.out.printf(format,
-                    b.getBookId(),
-                    b.getTitle(),
-                    b.getAuthor(),
-                    b.getGenre(),
-                    b.getTotalCopies(),
-                    b.getCopiesAvailable(),
-                    b.getTimesBorrowed());
+            System.out.printf(format,b.getBookId(),b.getTitle(),b.getAuthor(),b.getGenre(),b.getTotalCopies(),b.getCopiesAvailable(),
+                    b.getTimesBorrowed(),b.getStatus().name());
         }
 
-        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+");
+        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+----------------+");
     }
     public  void printBook(Book b) {
-        String format = "| %-8s | %-25s | %-20s | %-15s | %-12s | %-13s | %-14s |\n";
+        String format = "| %-8s | %-25s | %-20s | %-15s | %-12s | %-13s | %-14s | %-14s |\n";
 
 
-        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+");
-        System.out.printf(format, "Book ID", "Title", "Author", "Genre", "Total Copies", "Available", "Times Borrowed");
-        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+");
+        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+----------------+");
+        System.out.printf(format, "Book ID", "Title", "Author", "Genre", "Total Copies", "Available", "Times Borrowed","Status");
+        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+----------------+");
 
-        System.out.printf(format,
-                b.getBookId(),
-                truncate(b.getTitle(), 25),
-                truncate(b.getAuthor(), 20),
-                b.getGenre(),
-                b.getTotalCopies(),
-                b.getCopiesAvailable(),
-                b.getTimesBorrowed());
+        System.out.printf(format,b.getBookId(),b.getTitle(),b.getAuthor(),b.getGenre(),b.getTotalCopies(),b.getCopiesAvailable(),
+                b.getTimesBorrowed(),b.getStatus().name());
 
-        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+");
+        System.out.println("+----------+---------------------------+----------------------+-----------------+--------------+---------------+----------------+----------------+");
     }
 
 
