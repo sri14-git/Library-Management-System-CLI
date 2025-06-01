@@ -49,7 +49,7 @@ public class MembersController {
                     System.out.println("********************************");
                     System.out.print("Enter your Choice: ");
                     switch (sc.nextInt()) {
-                        case 1: { /// need to update times borrowed
+                        case 1: {
                             List<Book> books = bookService.getAvailableBooks();
                             if (!books.isEmpty()) {
                                 bookService.printBooks(books);

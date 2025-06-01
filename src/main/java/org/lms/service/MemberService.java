@@ -18,9 +18,7 @@ public class MemberService {
     public Member findById(int id){
         return memberDAO.findById(id);
     }
-    public void update(Member member){ /// /need to remove this
-        memberDAO.update(member);
-    }
+
     public List<Member> findAll(){
         return memberDAO.findAll();
     }
