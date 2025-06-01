@@ -63,7 +63,7 @@ A robust Java-based Library Management System that helps librarians and members 
 - JPA API 2.2
 
 ### Database Configuration
-1. Create a PostgreSQL database
+1. Create a PostgreSQL database and name it as "LibraryPU" for seamless access to database or else for using existing database, kindly change the name of the database `EntityManagerFactory emf = Persistence.createEntityManagerFactory("<DATABASE_NAME>");` in Main.java (line no:20)
 2. Configure database connection in `persistence.xml`:
     - Database URL
     - Username
