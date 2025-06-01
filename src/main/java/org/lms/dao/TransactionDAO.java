@@ -23,12 +23,18 @@ public class TransactionDAO {
     }
 
     public Transaction findById(int id) {
-        return em.find(Transaction.class,id);
+
+        try{
+            return em.find(Transaction.class,id);
+        }
+        catch (Exception e){
+            return null;
+        }
     }
 
 
     public List<Transaction> getByType(TransactionType type){
-        TypedQuery<Transaction> query = em.createQuery("Select t from Transaction t where t.type = :type"
+        TypedQuery<Transaction> query = em.createQuery("Select t from Transaction t where t.type = :type "
                                                         , Transaction.class);
         query.setParameter("type",type);
         return query.getResultList();
@@ -42,16 +48,16 @@ public class TransactionDAO {
 
 
     public List<Transaction> findAll() {
-        TypedQuery<Transaction> query =em.createQuery("SELECT t FROM Transaction t",Transaction.class);
+        TypedQuery<Transaction> query =em.createQuery("SELECT t FROM Transaction t ORDER BY t.transactionId ",Transaction.class);
         return query.getResultList();
     }
-    public Transaction findOpenBorrow(int bookId, int memberId) {
-        TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE t.book.bookId = :bookId " +
+    public Transaction findOpenBorrow(int transactionID, int memberId) {
+        TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE t.transactionId = :transactionId " +
                         "AND t.member.memberId = :memberId " +
                         "AND t.type = 'BORROW' " +
                         "AND t.actualReturnDate IS NULL AND t.status = :status", Transaction.class);
 
-        query.setParameter("bookId", bookId);
+        query.setParameter("transactionId", transactionID);
         query.setParameter("memberId", memberId);
         query.setParameter("status", Status.ACTIVE);
         return query.getResultStream().findFirst().orElse(null);
@@ -65,17 +71,18 @@ public class TransactionDAO {
 //        return query.getSingleResult().intValue();
 //
 //    }
-    public List<Transaction> getMembersTransactionsByType(int memberId, TransactionType type) {
+    public List<Transaction> getMembersTransactionsByType(int memberId, TransactionType type,Status status) {
         TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE " +
-                                            "t.member.memberId = :memberId AND t.type = :type", Transaction.class);
+                                            "t.member.memberId = :memberId AND t.type = :type AND t.status = :status ORDER BY t.transactionId", Transaction.class);
         query.setParameter("memberId", memberId);
         query.setParameter("type", type);
+        query.setParameter("status", status);
         return query.getResultList();
 
     }
 
     public List<Transaction> findByMemberId(int memberId) {
-        TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE t.member.memberId = :memberId"
+        TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE t.member.memberId = :memberId ORDER BY t.transactionId "
                                                         ,Transaction.class);
         query.setParameter("memberId",memberId);
         return query.getResultList();

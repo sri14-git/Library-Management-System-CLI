@@ -3,6 +3,7 @@ package org.lms.dao;
 import org.lms.model.Member;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.List;
 
@@ -20,7 +21,12 @@ public class MemberDAO {
         em.getTransaction().commit();
     }
     public Member findById(int memberId){
-        return em.find(Member.class, memberId);
+        try {
+            return em.find(Member.class, memberId);
+        }
+        catch (Exception e){
+            return null;
+        }
     }
     public void update(Member member) {
         em.getTransaction().begin();
@@ -39,14 +45,18 @@ public class MemberDAO {
     }
     
     public List<Member> findAll(){
-     TypedQuery<Member> query = em.createQuery("SELECT m FROM Member m",Member.class);
+     TypedQuery<Member> query = em.createQuery("SELECT m FROM Member m ORDER BY m.memberId",Member.class);
      return query.getResultList();
     }
 
     public Member findByUsername(String username) {
-        TypedQuery<Member> query=em.createQuery("SELECT m from Member m WHERE m.username=:username", Member.class);
-        query.setParameter("username",username);
-        return query.getSingleResult();
+        try {
+            TypedQuery<Member> query = em.createQuery("SELECT m FROM Member m WHERE m.username = :username ", Member.class);
+            query.setParameter("username", username);
+            return query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
 }

@@ -88,8 +88,8 @@ public class Transaction {
         return actualReturnDate;
     }
 
-    public void setExpectedReturnDate(LocalDateTime expectedReturnDate) {
-        this.expectedReturnDate = expectedReturnDate;
+    public void setType(TransactionType type) {
+        this.type = type;
     }
 
     public void setActualReturnDate(LocalDateTime actualReturnDate) {
@@ -101,21 +101,12 @@ public class Transaction {
         this.member = member;
     }
 
-    public void setBook(Book book) {
-        this.book = book;
-    }
+
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public void setDate(LocalDateTime date) {
-        this.date = date;
-    }
-
-    public void setType(TransactionType type) {
-        this.type = type;
-    }
 
     public Status getStatus() {
         return status;

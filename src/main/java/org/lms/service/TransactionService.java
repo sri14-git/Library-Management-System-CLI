@@ -13,6 +13,8 @@ import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
 
+
+
 public class TransactionService {
 
     private final EntityManager em;
@@ -43,18 +45,26 @@ public class TransactionService {
             System.out.println("Not enough copies available");
         }
         else{
+//            int totalBorrowed = book.getTimesBorrowed();
             book.setCopiesAvailable(book.getCopiesAvailable() - 1);
+            book.setTimesBorrowed(book.getTimesBorrowed() + 1);
             bookDAO.update(book);
             Transaction transaction = new Transaction(member,book,date, TransactionType.BORROW,expectedReturnDate,null, Status.ACTIVE);
             transactionDAO.save(transaction);
         }
-        System.out.println("Book borrowed successfully,Kindly return on or before"+expectedReturnDate);
+        System.out.println("Book borrowed successfully,Kindly return on or before "+expectedReturnDate.toLocalDate() );
     }
 
-    public void returnBook(int memberId, int bookId){
-        Book book = bookDAO.findById(bookId);
-        Member member = memberDAO.findById(memberId);
-        Transaction borrow = transactionDAO.findOpenBorrow(bookId,memberId);
+    public void returnBook(int memberId, int transactionId){
+        Transaction transaction = transactionDAO.findById(transactionId);
+        if (transaction == null)
+        {
+            System.out.println("Invalid transaction id");
+            return;
+        }
+        Book book = bookDAO.findById(transaction.getBook().getBookId());
+        Member member = memberDAO.findById(transaction.getMember().getMemberId());
+        Transaction borrow = transactionDAO.findOpenBorrow(transactionId,memberId);
         LocalDateTime date = LocalDateTime.now();
         if (book == null){
             System.out.println("Book not found");
@@ -79,18 +89,17 @@ public class TransactionService {
         }
         book.setCopiesAvailable(book.getCopiesAvailable() + 1);
 
-        Transaction transaction = new Transaction(member,book,date,TransactionType.RETURN,null,date,Status.COMPLETED);
+        Transaction newtransaction = new Transaction(member,book,date,TransactionType.RETURN,null,date,Status.COMPLETED);
         borrow.setStatus(Status.COMPLETED);
         borrow.setQuantity(borrowedQty - 1);
-        transactionDAO.save(transaction);
+        borrow.setStatus(Status.COMPLETED); //need to check if this is needed
+        transactionDAO.save(newtransaction);
         borrow.setActualReturnDate(date);
         transactionDAO.update(borrow); ///updatind borrowed Status
 
-
-
     }
-    public List<Transaction> getMemberTransactionByType(int memberId, TransactionType type){
-        return transactionDAO.getMembersTransactionsByType(memberId,type);
+    public List<Transaction> getMemberTransactionByType(int memberId, TransactionType type,Status status){
+        return transactionDAO.getMembersTransactionsByType(memberId,type,status);
     }
     ///*************LIBRARIAN*****************
     public List<Transaction> getMemberTransactions(int memberId){
@@ -104,6 +113,56 @@ public class TransactionService {
     }
     public Transaction findById(int id){
         return transactionDAO.findById(id);
+    }
+
+    /// **********Print**********
+    public void printTransactions(List<Transaction> transactions){
+
+        String format = "| %-13s | %-10s | %-6s | %-25s | %-8s | %-16s | %-6s | %-18s | %-18s | %-9s |\n";
+        String separator = "+---------------+------------+--------+---------------------------+----------+------------------+--------+--------------------+--------------------+-----------+";
+
+        System.out.println(separator);
+        System.out.printf(format, "TransactionID", "MemberName", "BookID", "Title", "Quantity", "Date", "Type", "ExpectedReturn", "ActualReturn", "Status");
+        System.out.println(separator);
+
+        for (Transaction t : transactions) {
+            String memberName = t.getMember().getName();
+            String title = t.getBook().getTitle();
+            int bookId = t.getBook().getBookId();
+            int txnId = t.getTransactionId();
+            int qty = t.getQuantity();
+            String date = t.getDate().toLocalDate().toString();
+            String expected = t.getExpectedReturnDate() != null ? t.getExpectedReturnDate().toLocalDate().toString() : "--";
+            String actual = t.getActualReturnDate() != null ? t.getActualReturnDate().toLocalDate().toString() : "--";
+            String status = t.getStatus().name();
+
+            System.out.printf(format, txnId, memberName, bookId, title, qty, date, t.getType(), expected, actual, status);
+        }
+
+        System.out.println(separator);
+    }
+    public void printTransactions(Transaction t){
+
+        String format = "| %-13s | %-10s | %-6s | %-25s | %-8s | %-16s | %-6s | %-18s | %-18s | %-9s |\n";
+        String separator = "+---------------+------------+--------+---------------------------+----------+------------------+--------+--------------------+--------------------+-----------+";
+
+        System.out.println(separator);
+        System.out.printf(format, "TransactionID", "MemberName", "BookID", "Title", "Quantity", "Date", "Type", "ExpectedReturn", "ActualReturn", "Status");
+        System.out.println(separator);
+
+            String memberName = t.getMember().getName();
+            String title = t.getBook().getTitle();
+            int bookId = t.getBook().getBookId();
+            int txnId = t.getTransactionId();
+            int qty = t.getQuantity();
+            String date = t.getDate().toLocalDate().toString();
+            String expected = t.getExpectedReturnDate() != null ? t.getExpectedReturnDate().toLocalDate().toString() : "--";
+            String actual = t.getActualReturnDate() != null ? t.getActualReturnDate().toLocalDate().toString() : "--";
+            String status = t.getStatus().name();
+
+            System.out.printf(format, txnId, memberName, bookId, title, qty, date, t.getType(), expected, actual, status);
+
+        System.out.println(separator);
     }
 
 

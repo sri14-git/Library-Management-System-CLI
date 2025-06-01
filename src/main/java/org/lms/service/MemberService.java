@@ -35,4 +35,34 @@ public class MemberService {
         }
         memberDAO.remove(memberId);
     }
+    public  void printMembers(List<Member> members) {
+        String format = "| %-10s | %-20s | %-15s | %-15s |\n";
+        String separator = "+------------+----------------------+-----------------+-----------------+";
+
+        System.out.println(separator);
+        System.out.printf(format, "Member ID", "Name", "Username", "Password");
+        System.out.println(separator);
+
+        for (Member m : members) {
+            String masked = "*".repeat(m.getPassword().length());
+            System.out.printf(format, m.getMemberId(), m.getName(), m.getUsername(), masked);
+        }
+
+        System.out.println(separator);
+    }
+
+    public  void printMember(Member m) {
+        String format = "| %-10s | %-20s | %-15s | %-15s |\n";
+        String separator = "+------------+----------------------+-----------------+-----------------+";
+
+        System.out.println(separator);
+        System.out.printf(format, "Member ID", "Name", "Username", "Password");
+        System.out.println(separator);
+
+        String masked = "*".repeat(m.getPassword().length());
+        System.out.printf(format, m.getMemberId(), m.getName(), m.getUsername(), masked);
+
+        System.out.println(separator);
+    }
+
 }
