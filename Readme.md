@@ -2,6 +2,30 @@
 
 A robust Java-based Library Management System that helps librarians and members manage books, transactions, and memberships effectively.
 
+## Diagrams
+
+### Class Diagram
+![Class Diagram](diagrams/ClassDiagramUML.png)
+
+### Database Model
+![Database Diagram](diagrams/DatabaseER.png)
+
+## Project Structure
+├── src/
+│ ├── controller/
+│ ├── service/
+│ ├── dao/
+│ ├── model/
+│ ├── enums/
+│ └── Main.java
+├── diagrams/
+│ ├── class-diagram.png
+│ └── db-diagram.png
+├── resources/
+│ └── persistence.xml
+├── README.md
+└── pom.xml
+
 ## Features
 
 ### Authentication
@@ -70,8 +94,8 @@ A robust Java-based Library Management System that helps librarians and members 
    - Create a new PostgreSQL database
    - Update `persistence.xml` with your database credentials
 
-5. Run the application: bash java -jar target/library-management-system-1.0-SNAPSHOT.jar
-
+5. Run the application:
+   Compile and run `Main.java` using your IDE (VS Code or IntelliJ) or the terminal:
 
 ## Database Schema
 
