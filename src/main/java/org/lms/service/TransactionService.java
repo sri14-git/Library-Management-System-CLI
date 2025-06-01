@@ -33,11 +33,11 @@ public class TransactionService {
         Member member = memberDAO.findById(memberId);
         LocalDateTime date = LocalDateTime.now();
         LocalDateTime expectedReturnDate = date.plusDays(7);
-        if (book == null){
+        if (book == null || book.getStatus() != Status.AVAILABLE){
             System.out.println("Book not found");
             return;
         }
-        if (member == null){
+        if (member == null || member.getStatus() != Status.ACTIVE){
             System.out.println("Member not found");
             return;
         }
@@ -52,7 +52,7 @@ public class TransactionService {
             Transaction transaction = new Transaction(member,book,date, TransactionType.BORROW,expectedReturnDate,null, Status.ACTIVE);
             transactionDAO.save(transaction);
         }
-        System.out.println("Book borrowed successfully,Kindly return on or before (7 days)"+expectedReturnDate.toLocalDate() );
+        System.out.println("Book borrowed successfully,Kindly return on or before (7 days) "+expectedReturnDate.toLocalDate() );
     }
 
     public void returnBook(int memberId, int transactionId){
@@ -66,15 +66,15 @@ public class TransactionService {
         Member member = memberDAO.findById(transaction.getMember().getMemberId());
         Transaction borrow = transactionDAO.findOpenBorrow(transactionId,memberId);
         LocalDateTime date = LocalDateTime.now();
-        if (book == null){
+        if (book == null || book.getStatus() != Status.AVAILABLE){
             System.out.println("Book not found");
             return;
         }
-        if (member == null){
+        if (member == null|| member.getStatus() != Status.ACTIVE){
             System.out.println("Member not found");
             return;
         }
-        if (borrow == null){
+        if (borrow == null || borrow.getStatus() != Status.ACTIVE){
             System.out.println("No active borrow found");
             return;
         }
@@ -90,7 +90,6 @@ public class TransactionService {
         book.setCopiesAvailable(book.getCopiesAvailable() + 1);
 
         Transaction newtransaction = new Transaction(member,book,date,TransactionType.RETURN,null,date,Status.COMPLETED);
-        borrow.setStatus(Status.COMPLETED);
         borrow.setQuantity(borrowedQty - 1);
         borrow.setStatus(Status.COMPLETED); //need to check if this is needed
         transactionDAO.save(newtransaction);
@@ -113,6 +112,9 @@ public class TransactionService {
     }
     public Transaction findById(int id){
         return transactionDAO.findById(id);
+    }
+    public List<Transaction> getbyBookId(int bookid){
+        return transactionDAO.getbyBookId(bookid);
     }
 
     /// **********Print**********

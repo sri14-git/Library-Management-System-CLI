@@ -135,7 +135,7 @@ public class LibrarianController {
                     System.out.print("Enter The ID Of The Book To Update Stock: ");
                     int id = sc.nextInt();
                     Book book = bookService.findById(id);
-                    if (book == null) {
+                    if (book == null || book.getStatus().name().equals(Status.UNAVAILABLE.name())) {
                         System.out.println("Invalid ID");
                         break;
                     }
@@ -149,6 +149,7 @@ public class LibrarianController {
                             System.out.println("Book is now Available");
                         }
                         bookService.update(book);
+                        System.out.println("Successfully Updated Stock");
                     }
                     break;
                 }
@@ -231,9 +232,11 @@ public class LibrarianController {
             System.out.println("1. Add Members");
             System.out.println("2. Delete Members");
             System.out.println("3. View All Members");
-            System.out.println("4. Find By ID");
-            System.out.println("5. Find By Username");
-            System.out.println("6. Exit");
+            System.out.println("4. View All Active Members");
+            System.out.println("5. Find By ID");
+            System.out.println("6. Find By Username");
+            System.out.println("7. Make User Active");
+            System.out.println("8. Exit");
                 System.out.println("******************************");
             System.out.print("Enter your Choice: ");
             int choice = sc.nextInt();
@@ -244,20 +247,32 @@ public class LibrarianController {
                     String name = sc.nextLine();
                     System.out.println("Enter Username of the Member");
                     String username = sc.nextLine();
-                    if (memberService.findByUsername(username) != null) {
+                    Member member = memberService.findByUsername(username);
+                    if (member != null) {
                         System.out.println("Username already exists");
+                        if(!member.getName().equals(name)){
+                            System.out.println("User with same name is a existing member, kindly change the Username" +
+                                    " and try again");
+                            break;
+                        }
+                        System.out.println("Enter new password of the Member");
+                        String password = sc.nextLine();
+                        member.setPassword(password);
+                        member.setStatus(Status.ACTIVE);
+                        memberService.update(member);
+                        System.out.println("Member Active Successfully with new Password");
                         break;
                     }
                     System.out.println("Enter password of the Member");
                     String password = sc.nextLine();
-                    Member member = new Member(name, username, password);
-                    memberService.save(member);
-                    memberService.printMember(member);
+                    Member member1 = new Member(name, username, password,Status.ACTIVE);
+                    memberService.save(member1);
+                    memberService.printMember(member1);
                     System.out.println("Member Created Successfully");
                     break;
                 }
                 case 2: {
-                    List<Member> members = memberService.findAll();
+                    List<Member> members = memberService.findAll().stream().filter(member -> member.getStatus().name().equals(Status.ACTIVE.name())).toList();
                     if (!members.isEmpty()) {
                         memberService.printMembers(members);
                     } else {
@@ -267,11 +282,20 @@ public class LibrarianController {
                     System.out.println("Enter The Id of the Member that is to be Deleted");
                     int id = sc.nextInt();
                     sc.nextLine();
-                    if (memberService.findById(id) == null) {
+                    Member member = memberService.findById(id);
+                    if (member == null || member.getStatus().name().equals(Status.INACTIVE.name())) {
                         System.out.println("Invalid ID");
                         break;
                     }
-                    memberService.remove(id);
+                    List<Transaction> transaction = transactionService.getMemberTransactions(id).stream()
+                            .filter(transaction1 -> transaction1.getStatus().name().equals(Status.ACTIVE.name()))
+                            .toList();
+                    if(!transaction.isEmpty()){
+                            System.out.println("Member is currently in use, kindly return the book first before deleting it");
+                            break;
+                    }
+                    member.setStatus(Status.INACTIVE);
+                    memberService.update(member);
                     System.out.println("Member is Successfully Deleted");
                     break;
                 }
@@ -286,6 +310,18 @@ public class LibrarianController {
                     break;
                 }
                 case 4: {
+                    List<Member> members = memberService.findAll().stream()
+                            .filter(member -> member.getStatus().name().equals(Status.ACTIVE.name())).toList();
+                    if (!members.isEmpty()) {
+                        System.out.println("printing");
+                        memberService.printMembers(members);
+                    } else {
+                        System.out.println("No Active Members Found");
+                        break;
+                    }
+                    break;
+                }
+                case 5: {
                     System.out.println("Enter the ID of the Member");
                     int id = sc.nextInt();
                     sc.nextLine();
@@ -296,7 +332,7 @@ public class LibrarianController {
                     memberService.printMember(memberService.findById(id));
                     break;
                 }
-                case 5: {
+                case 6: {
                     System.out.println("Enter the Username of the Member");
                     String username = sc.nextLine();
                     if (memberService.findByUsername(username) == null) {
@@ -307,14 +343,35 @@ public class LibrarianController {
                     break;
                 }
 
-                case 6: {
+                case 7: {
+                    List<Member> members = memberService.findAll().stream().
+                            filter(member -> member.getStatus().name().equals(Status.INACTIVE.name()))
+                            .toList();
+                    if (!members.isEmpty()) {
+                        memberService.printMembers(members);
+                    } else {
+                        System.out.println("No Inactive Members Found");
+                        break;
+                    }
+                    System.out.println("Enter the ID of the Member to make Active");
+                    int id = sc.nextInt();
+                    sc.nextLine();
+                    Member member = memberService.findById(id);
+                    if (member == null || member.getStatus().name().equals(Status.ACTIVE.name())) {
+                        System.out.println("Invalid ID");
+                        break;
+                    }
+                    member.setStatus(Status.ACTIVE);
+                    memberService.update(member);
+                    System.out.println("Member is Successfully Activated");
+                }
+                break;
+                case 8: {
                     flag = 1;
                     break;
                 }
                 default:
                     System.out.println("Invalid Choice");
-
-
             }
         }catch(InputMismatchException e){
                 System.out.println("Kindly Make Sure,ID are given Correctly and Try Again");
@@ -338,7 +395,8 @@ public class LibrarianController {
                 System.out.println("3. Transactions of Type");
                 System.out.println("4. Transactions by Status");
                 System.out.println("5. Find By ID");
-                System.out.println("6. Exit");
+                System.out.println("6. Find By Book ID");
+                System.out.println("7. Exit");
                 System.out.println("******************************************");
                 System.out.print("Enter your Choice: ");
                 int choice = sc.nextInt();
@@ -412,6 +470,25 @@ public class LibrarianController {
                         break;
                     }
                     case 6: {
+                        List<Book> books = bookService.findAll();
+                        if (!books.isEmpty()) {
+                            bookService.printBooks(books);
+                        } else {
+                            System.out.println("No Books Found");
+                            break;
+                        }
+                        System.out.println("Enter the Book ID to get All the Transaction Consisting of that Book");
+                        int bookid= sc.nextInt();
+                        sc.nextLine();
+                        List<Transaction> transactions = transactionService.getbyBookId(bookid);
+                        if (!transactions.isEmpty()) {
+                            transactionService.printTransactions(transactions);
+                        }else{
+                            System.out.println("No Transactions Found");
+                        }
+                        break;
+                    }
+                    case 7: {
                         flag = 1;
                         break;
                     }

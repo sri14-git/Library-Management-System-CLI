@@ -35,12 +35,14 @@ public class MembersController {
         int flag = 0;
         try {
             Member member = authService.authenticate(username, password);
-            if (member == null) {
+            if (member == null || member.getStatus().name().equals(Status.INACTIVE.name())) {
                 System.out.println("Login Failed");
                 return;
             }
             if (member.getPassword().equals(password)) {
+
                 while (flag == 0) {
+                    try{
                     System.out.println("********Login Successful*******");
                     System.out.println("1.Borrow Books");
                     System.out.println("2.Return Books");
@@ -48,7 +50,8 @@ public class MembersController {
                     System.out.println("4.Exit");
                     System.out.println("********************************");
                     System.out.print("Enter your Choice: ");
-                    switch (sc.nextInt()) {
+                    int choice = sc.nextInt();
+                    switch (choice) {
                         case 1: {
                             List<Book> books = bookService.getAvailableBooks();
                             if (!books.isEmpty()) {
@@ -57,10 +60,16 @@ public class MembersController {
                                 System.out.println("No Books Found");
                                 break;
                             }
-                            System.out.print("Enter The ID Of The Book To Borrow: ");
-                            int id = sc.nextInt();
-                            sc.nextLine();
-                            transactionService.borrowBook(member.getMemberId(), id);
+                            try {
+                                System.out.print("Enter The ID Of The Book To Borrow: ");
+                                int id = sc.nextInt();
+                                sc.nextLine();
+                                transactionService.borrowBook(member.getMemberId(), id);
+                            }
+                            catch (InputMismatchException e){
+                                System.out.println("Invalid Book ID");
+                                break;
+                            }
 
                             break;
                         }
@@ -69,14 +78,19 @@ public class MembersController {
                             if (!transactions.isEmpty()) {
                                 transactionService.printTransactions(transactions);
                             } else {
-                                System.out.println("No Transactions Found");
+                                System.out.println("No Return Transactions Found");
                                 break;
                             }
                             System.out.print("Enter The ID Of The Transaction To Return: ");
-                            int tid = sc.nextInt();
-                            sc.nextLine();
-                            transactionService.returnBook(member.getMemberId(), tid);
-                            System.out.println("Thank you for returning");
+                            try {
+                                int tid = sc.nextInt();
+                                sc.nextLine();
+                                transactionService.returnBook(member.getMemberId(), tid);
+                                System.out.println("Thank you for returning");
+                            }catch (InputMismatchException e){
+                                System.out.println("Invalid Transaction ID");
+                                sc.nextLine();
+                            }
                             break;
                         }
                         case 3: {
@@ -97,7 +111,10 @@ public class MembersController {
                             break;
                         }
                     }
-                }
+                } catch (InputMismatchException e) {
+                    System.out.println("Enter a valid choice");
+                    sc.nextLine();
+                }}
             }
         } catch (InputMismatchException e) {
             System.out.println("Failed");

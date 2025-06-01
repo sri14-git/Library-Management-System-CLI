@@ -54,7 +54,7 @@ public class MemberDAO {
             TypedQuery<Member> query = em.createQuery("SELECT m FROM Member m WHERE m.username = :username ", Member.class);
             query.setParameter("username", username);
             return query.getSingleResult();
-        } catch (NoResultException e) {
+        } catch (Exception e) {
             return null;
         }
     }

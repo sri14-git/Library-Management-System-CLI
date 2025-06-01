@@ -33,34 +33,41 @@ public class MemberService {
         }
         memberDAO.remove(memberId);
     }
-    public  void printMembers(List<Member> members) {
-        String format = "| %-10s | %-20s | %-15s | %-15s |\n";
-        String separator = "+------------+----------------------+-----------------+-----------------+";
+    public void update(Member member){
+        memberDAO.update(member);
+    }
 
-        System.out.println(separator);
-        System.out.printf(format, "Member ID", "Name", "Username", "Password");
-        System.out.println(separator);
+    public  void printMembers(List<Member> members) {
+        String format = "| %-10s | %-20s | %-15s | %-15s | %-14s |\n";
+
+        System.out.println("+------------+----------------------+-----------------+-----------------+-----------------+");
+        System.out.printf(format, "Member ID", "Name", "Username", "Password", "Status");
+        System.out.println("+------------+----------------------+-----------------+-----------------+-----------------+");
+
 
         for (Member m : members) {
             String masked = "*".repeat(m.getPassword().length());
-            System.out.printf(format, m.getMemberId(), m.getName(), m.getUsername(), masked);
+            System.out.printf(format, m.getMemberId(), m.getName(), m.getUsername(), masked, m.getStatus().name());
         }
 
-        System.out.println(separator);
+        System.out.println("+------------+----------------------+-----------------+-----------------+-----------------+");
+
     }
 
     public  void printMember(Member m) {
-        String format = "| %-10s | %-20s | %-15s | %-15s |\n";
-        String separator = "+------------+----------------------+-----------------+-----------------+";
+        String format = "| %-10s | %-20s | %-15s | %-15s | %-14s |\n";
+        String separator = "+------------+----------------------+-----------------+-----------------+-----------------+";
 
-        System.out.println(separator);
-        System.out.printf(format, "Member ID", "Name", "Username", "Password");
-        System.out.println(separator);
+        System.out.println("+------------+----------------------+-----------------+-----------------+-----------------+");
+        System.out.printf(format, "Member ID", "Name", "Username", "Password", "Status");
+        System.out.println("+------------+----------------------+-----------------+-----------------+-----------------+");
+
 
         String masked = "*".repeat(m.getPassword().length());
-        System.out.printf(format, m.getMemberId(), m.getName(), m.getUsername(), masked);
+        System.out.printf(format, m.getMemberId(), m.getName(), m.getUsername(), masked, m.getStatus().name());
 
-        System.out.println(separator);
+        System.out.println("+------------+----------------------+-----------------+-----------------+-----------------+");
+
     }
 
 }

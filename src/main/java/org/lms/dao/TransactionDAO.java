@@ -81,6 +81,13 @@ public class TransactionDAO {
 
     }
 
+    public List<Transaction> getbyBookId(int bookId) {
+        TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE t.book.bookId = :bookId ORDER BY t.transactionId "
+                                                        ,Transaction.class);
+        query.setParameter("bookId",bookId);
+        return query.getResultList();
+    }
+
     public List<Transaction> findByMemberId(int memberId) {
         TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE t.member.memberId = :memberId ORDER BY t.transactionId "
                                                         ,Transaction.class);

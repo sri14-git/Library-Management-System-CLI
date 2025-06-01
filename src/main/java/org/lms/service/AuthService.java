@@ -18,7 +18,7 @@ public class AuthService {
             return admin;
         }
         Member member = memberDAO.findByUsername(username);
-        if (member != null && member.getPassword().equals(password)) {
+        if (member != null && member.getPassword().equals(password) && member.getStatus().name().equals("ACTIVE")) {
             return member;
         }
 

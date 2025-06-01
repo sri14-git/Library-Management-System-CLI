@@ -48,6 +48,8 @@ public class Main {
             }catch (InputMismatchException e){
                 System.out.println("Kindly Make Sure, to Choose a valid option");
                 sc.nextLine();
+            } catch (Exception e) {
+                System.out.println("Error Occurred, Please Try Again");
             }
         }
         sc.close();

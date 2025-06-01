@@ -1,5 +1,7 @@
 package org.lms.model;
 
+import org.lms.enums.Status;
+
 import javax.persistence.*;
 
 @Entity
@@ -18,6 +20,9 @@ public class Member {
 
     @Column(nullable = false)
     private String password;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     public void setName(String name) {
         this.name = name;
@@ -42,17 +47,26 @@ public class Member {
     public String getPassword() {
         return password;
     }
-
-    public Member() {}
-
-    public Member(String name, String username, String password) {
-        this.name = name;
-        this.username = username;
+    public void setPassword(String password) {
         this.password = password;
     }
 
-    @Override
-    public String toString() {
-        return String.format("| %-10d | %-20s | %-15s | %-15s |", memberId,name,username,password); // Mask password for security
+    public Member() {}
+
+    public Status getStatus() {
+        return status;
     }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public Member(String name, String username, String password,Status status) {
+        this.name = name;
+        this.username = username;
+        this.password = password;
+        this.status = status;
+    }
+
+
 }
