@@ -170,6 +170,10 @@ public class LibrarianController {
                     int id = sc.nextInt();
                     sc.nextLine();
                     Book book = bookService.findById(id);
+                    if (book == null || book.getStatus().name().equals(Status.UNAVAILABLE.name())) {
+                        System.out.println("Book is not available for deletion");
+                        break;
+                    }
                     List<Transaction> transactions = transactionService.getTransactionsByType(TransactionType.BORROW).stream()
                             .filter(transaction -> transaction.getStatus().name().equals(Status.ACTIVE.name()))
                             .filter(transaction -> transaction.getBook().getBookId()==book.getBookId()).toList();
