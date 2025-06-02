@@ -87,7 +87,7 @@ public class LibrarianController {
 
 
     }
-     public void manageBooks () {/// need to make changes and add status in the book
+     public void manageBooks () {
         int flag = 0;
         while (flag == 0) {
             try{
@@ -142,6 +142,12 @@ public class LibrarianController {
                     else {
                         System.out.print("Enter the No Of Copies To Be Added: ");
                         int copies = sc.nextInt();
+                        sc.nextLine();
+                        if(book.getCopiesAvailable()+copies<0){
+                            System.out.println("Invalid Quantity Or " +
+                                    "Make Sure All Copies are Returned Before Updating Stock");
+                            break;
+                        }
                         book.setCopiesAvailable(book.getCopiesAvailable() + copies);
                         book.setTotalCopies(book.getTotalCopies() + copies);
                         if(book.getStatus().name().equals(Status.UNAVAILABLE.name())){

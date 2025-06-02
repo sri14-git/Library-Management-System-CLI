@@ -91,10 +91,10 @@ public class TransactionService {
 
         Transaction newtransaction = new Transaction(member,book,date,TransactionType.RETURN,null,date,Status.COMPLETED);
         borrow.setQuantity(borrowedQty - 1);
-        borrow.setStatus(Status.COMPLETED); //need to check if this is needed
+        borrow.setStatus(Status.COMPLETED);
         transactionDAO.save(newtransaction);
         borrow.setActualReturnDate(date);
-        transactionDAO.update(borrow); ///updatind borrowed Status
+        transactionDAO.update(borrow);
 
     }
     public List<Transaction> getMemberTransactionByType(int memberId, TransactionType type,Status status){
@@ -121,12 +121,11 @@ public class TransactionService {
     public void printTransactions(List<Transaction> transactions){
 
         String format = "| %-13s | %-10s | %-6s | %-25s | %-8s | %-16s | %-6s | %-18s | %-18s | %-9s |\n";
-        String separator = "+---------------+------------+--------+---------------------------+----------+------------------+--------+--------------------+--------------------+-----------+";
-
-        System.out.println(separator);
+        String sept = "+---------------+------------+--------+---------------------------" +
+                "+----------+------------------+--------+--------------------+--------------------+-----------+";
+        System.out.println(sept);
         System.out.printf(format, "TransactionID", "MemberName", "BookID", "Title", "Quantity", "Date", "Type", "ExpectedReturn", "ActualReturn", "Status");
-        System.out.println(separator);
-
+        System.out.println(sept);
         for (Transaction t : transactions) {
             String memberName = t.getMember().getName();
             String title = t.getBook().getTitle();
@@ -137,16 +136,15 @@ public class TransactionService {
             String expected = t.getExpectedReturnDate() != null ? t.getExpectedReturnDate().toLocalDate().toString() : "--";
             String actual = t.getActualReturnDate() != null ? t.getActualReturnDate().toLocalDate().toString() : "--";
             String status = t.getStatus().name();
-
             System.out.printf(format, txnId, memberName, bookId, title, qty, date, t.getType(), expected, actual, status);
         }
-
-        System.out.println(separator);
+        System.out.println(sept);
     }
     public void printTransactions(Transaction t){
 
         String format = "| %-13s | %-10s | %-6s | %-25s | %-8s | %-16s | %-6s | %-18s | %-18s | %-9s |\n";
-        String separator = "+---------------+------------+--------+---------------------------+----------+------------------+--------+--------------------+--------------------+-----------+";
+        String separator = "+---------------+------------+--------+-------------------------" +
+                "--+----------+------------------+--------+--------------------+--------------------+-----------+";
 
         System.out.println(separator);
         System.out.printf(format, "TransactionID", "MemberName", "BookID", "Title", "Quantity", "Date", "Type", "ExpectedReturn", "ActualReturn", "Status");

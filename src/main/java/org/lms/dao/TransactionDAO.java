@@ -63,14 +63,8 @@ public class TransactionDAO {
         return query.getResultStream().findFirst().orElse(null);
     }
 
-//    public int getPartialReturnedQty(int borrowTransactionId) {
-//        TypedQuery<Long> query = em.createQuery("SELECT SUM(ret.quantity) FROM Transaction ret, Transaction borrow " +
-//                        "WHERE borrow.transactionId = :borrowId AND ret.type = 'RETURN' " +
-//                        "AND ret.member = borrow.member AND ret.book = borrow.book AND ret.date > borrow.date", Long.class);
-//        query.setParameter("borrowId", borrowTransactionId);
-//        return query.getSingleResult().intValue();
 //
-//    }
+//
     public List<Transaction> getMembersTransactionsByType(int memberId, TransactionType type,Status status) {
         TypedQuery<Transaction> query = em.createQuery("SELECT t FROM Transaction t WHERE " +
                                             "t.member.memberId = :memberId AND t.type = :type AND t.status = :status ORDER BY t.transactionId", Transaction.class);
