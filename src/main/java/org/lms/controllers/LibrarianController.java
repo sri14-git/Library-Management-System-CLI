@@ -94,13 +94,12 @@ public class LibrarianController {
                 System.out.println("******** BOOKS MANAGEMENT *******");
             System.out.println("1.Add Book");
             System.out.println("2.Update Book stocks");
-            System.out.println("3.Delete Book"); //add available books option
+            System.out.println("3.Delete Book");
             System.out.println("4.List Books");
-            System.out.println("5. List Available Books");
+            System.out.println("5.List Available Books");
             System.out.println("6.Exit");
                 System.out.println("********************************");
             System.out.print("Enter your Choice:");
-
             int choice = sc.nextInt();
             sc.nextLine();
             switch (choice) {
@@ -167,7 +166,7 @@ public class LibrarianController {
                         System.out.println("No Books Found");
                         break;
                     }
-                    System.out.print("Enter The ID Book To Delete: ");
+                    System.out.print("Enter The ID Book To Delete (Cannot Delete Books That are Not Returned Yet) : ");
                     int id = sc.nextInt();
                     sc.nextLine();
                     Book book = bookService.findById(id);
@@ -180,7 +179,7 @@ public class LibrarianController {
 
                         System.out.println("Book is currently in use, kindly return the book first before deleting it");
                         break;
-                    }}catch (NoSuchElementException e){}
+                    }}catch (NoSuchElementException | ArrayIndexOutOfBoundsException e){}
                     book.setStatus(Status.UNAVAILABLE);
                     book.setCopiesAvailable(0);
                     book.setTotalCopies(0);
@@ -188,7 +187,8 @@ public class LibrarianController {
                     try{
                     bookService.update(book);
                     System.out.println("Deleted Successfully");
-                    break;}
+                    break;
+                    }
                     catch (NullPointerException e){
                         System.out.println("Book is not available for deletion");
                     }
@@ -255,9 +255,9 @@ public class LibrarianController {
                     String username = sc.nextLine();
                     Member member = memberService.findByUsername(username);
                     if (member != null) {
-                        System.out.println("Username already taken. Please choose a different username");
-                        if(!member.getName().equals(name)){
-                            System.out.println("User with same name is a existing member, kindly change the Username" +
+                        System.out.println("Username already exists");
+                        if(!member.getName().toLowerCase().equals(name.toLowerCase())){
+                            System.out.println("User is a existing member, kindly change the Username" +
                                     " and try again");
                             break;
                         }
@@ -278,7 +278,8 @@ public class LibrarianController {
                     break;
                 }
                 case 2: {
-                    List<Member> members = memberService.findAll().stream().filter(member -> member.getStatus().name().equals(Status.ACTIVE.name())).toList();
+                    List<Member> members = memberService.findAll().stream()
+                            .filter(member -> member.getStatus().name().equals(Status.ACTIVE.name())).toList();
                     if (!members.isEmpty()) {
                         memberService.printMembers(members);
                     } else {
@@ -437,9 +438,24 @@ public class LibrarianController {
                         break;
                     }
                     case 3: {
+                        TransactionType type= TransactionType.BORROW;
+                        System.out.println("Choose Type Of Transaction");
+                        System.out.println("1. Borrow");
+                        System.out.println("2. Return");
+                        System.out.print("Enter the Option: ");
+                        int op = sc.nextInt();
+                        sc.nextLine();
+                        if (op==2){
+                            type =  TransactionType.RETURN;
+                        }
+                        else if(op==1){
+                             type =  TransactionType.BORROW;
+                        }
+                        else {
+                            System.out.println("Invalid ID");
+                            break;
+                        }
 
-                        System.out.println("Enter the Type of the Transaction (Borrow/Return) DEFAULT: RETURN");
-                        TransactionType type = sc.nextLine().toUpperCase().equals("BORROW") ? TransactionType.BORROW : TransactionType.RETURN;
                         List<Transaction> transactions = transactionService.getTransactionsByType(type);
                         if (!transactions.isEmpty()) {
                             transactionService.printTransactions(transactions);
@@ -450,19 +466,46 @@ public class LibrarianController {
                     }
                     case 4: {
                         System.out.println("Enter the Status of the Transaction (Active/Completed))");
-                        String status = sc.nextLine().toUpperCase();
-                        System.out.println("Enter the Type of the Transaction (Borrow/Return) DEFAULT: RETURN");
-                        TransactionType type = sc.nextLine().toUpperCase().equals("BORROW") ? TransactionType.BORROW : TransactionType.RETURN;
-                        List<Transaction> transactions = transactionService.getTransactionsByType(type).stream()
-                                .filter(transaction -> transaction.getStatus().name().equals(status)).toList();
-                        if (!transactions.isEmpty()) {
-                            transactionService.printTransactions(transactions);
+                        System.out.println("1. ACTIVE");
+                        System.out.println("2. COMPLETED");
+                        System.out.print("Enter the Option: ");
+                        int op1 = sc.nextInt();
+                        Status status;
+                        if (op1 == 2) {
+                            status = Status.COMPLETED;
+                        } else if (op1 == 1) {
+                            status = Status.ACTIVE;
                         } else {
-                            System.out.println("No " + status + " Transactions Found Of Type " + type);
+                            status = Status.ACTIVE;
+                            System.out.println("Invalid Option");
+                            break;
                         }
-                        break;
+                            TransactionType type = TransactionType.BORROW;
+                            System.out.println("Choose Type Of Transaction");
+                            System.out.println("1. Borrow");
+                            System.out.println("2. Return");
+                            System.out.print("Enter the Option: ");
+                            int op = sc.nextInt();
+                            sc.nextLine();
+                            if (op == 2) {
+                                type = TransactionType.RETURN;
+                            } else if (op == 1) {
+                                type = TransactionType.BORROW;
+                            } else {
+                                System.out.println("Invalid Option");
+                                break;
+                            }
+                            List<Transaction> transactions = transactionService.getTransactionsByType(type).stream()
+                                    .filter(transaction -> transaction.getStatus() == status).toList();
+                            if (!transactions.isEmpty()) {
+                                transactionService.printTransactions(transactions);
+                            } else {
+                                System.out.println("No " + status + " Transactions Found Of Type " + type);
+                            }
+                            break;
 
-                    }
+                        }
+
                     case 5: {
                         System.out.println("Enter the ID of the Transaction");
                         int id = sc.nextInt();
