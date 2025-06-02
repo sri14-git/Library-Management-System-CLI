@@ -176,7 +176,7 @@ public class LibrarianController {
                             .filter(transaction -> transaction.getBook().getBookId()==book.getBookId()).toList();
 //                    transactionService.printTransactions(transactions);
                     try{
-                    if(transactions.getFirst()!=null || transactions.getFirst().getStatus().name().equals(Status.ACTIVE.name())){
+                    if(transactions.get(0)!=null || transactions.get(0).getStatus()== Status.ACTIVE){
 
                         System.out.println("Book is currently in use, kindly return the book first before deleting it");
                         break;
@@ -255,7 +255,7 @@ public class LibrarianController {
                     String username = sc.nextLine();
                     Member member = memberService.findByUsername(username);
                     if (member != null) {
-                        System.out.println("Username already exists");
+                        System.out.println("Username already taken. Please choose a different username");
                         if(!member.getName().equals(name)){
                             System.out.println("User with same name is a existing member, kindly change the Username" +
                                     " and try again");
